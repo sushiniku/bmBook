@@ -4,8 +4,8 @@
   "description": "シンプルな収支・口座管理アプリ",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f0f11",
-  "theme_color": "#0f0f11",
+  "background_color": "#faf7f2",
+  "theme_color": "#faf7f2",
   "orientation": "portrait",
   "icons": [
     {
