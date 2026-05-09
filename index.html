@@ -361,7 +361,7 @@ let modalType = 'income';
 let selectedCat = 'salary';
 let editId = null;
 let modalDate = null;
-let activeBankIdx = 0;
+let activeBankIdx = -1;
 
 // ── STORAGE ──
 function getData()    { try{return JSON.parse(localStorage.getItem('kakeibo_v3')||'{}')}catch{return{}} }
@@ -395,7 +395,7 @@ function getPeriod(off){
 }
 function fd(d){const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const dy=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${dy}`}
 function fm(n){return(n<0?'−':'')+'¥'+Math.abs(Math.round(n)).toLocaleString('ja-JP')}
-function fms(n){const a=Math.abs(n);if(a>=1000000)return(n<0?'-':'')+(a/1000000).toFixed(1)+'M';if(a>=10000)return(n<0?'-':'')+(a/10000).toFixed(0)+'万';return fm(n)}
+function fms(n){return fm(n)}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function getCatLabel(catId,type){
   const base=type==='income'?DEFAULT_CATS_INC:DEFAULT_CATS_EXP;
@@ -504,11 +504,14 @@ function renderDayDetail(ds,ptxs){
 function renderBankTabs(){
   const banks=getBankList();
   const el=document.getElementById('bankTabs');
-  el.innerHTML=banks.map((b,i)=>`
+  // -1 = 合計タブ
+  const allBtn=`<button class="bank-tab-btn ${activeBankIdx===-1?'active':''}" onclick="selectBank(-1)">合計</button>`;
+  const bankBtns=banks.map((b,i)=>`
     <button class="bank-tab-btn ${i===activeBankIdx?'active':''}" onclick="selectBank(${i})">
       ${esc(b)}
       ${banks.length>1?`<span class="del-bank" onclick="deleteBank(event,${i})">✕</span>`:''}
     </button>`).join('');
+  el.innerHTML=allBtn+bankBtns;
 }
 
 function selectBank(i){activeBankIdx=i;renderBankTabs();renderBank()}
@@ -539,28 +542,65 @@ function deleteBank(e,i){
 
 function renderBank(){
   const banks=getBankList();
-  const bankName=banks[activeBankIdx]||'';
-  document.getElementById('chartTitle').textContent=`${bankName} 残高推移`;
-  const recs=getBankRecs().filter(r=>r.bank===bankName).sort((a,b)=>a.month.localeCompare(b.month));
   const chart=document.getElementById('chartBars');
   const list=document.getElementById('bankList');
-  if(!recs.length){chart.innerHTML=`<div class="empty" style="width:100%">記録がありません</div>`;list.innerHTML='';return}
-  const max=Math.max(...recs.map(r=>r.amount));
-  const recent=recs.slice(-12);
-  chart.innerHTML=recent.map((r,i)=>{
-    const pct=max>0?(r.amount/max)*100:0;
-    const lbl=r.month.slice(2,4)+'/'+r.month.slice(5,7);
-    return`<div class="bar-wrap"><div class="bar-val">${fms(r.amount)}</div><div class="bar ${i===recent.length-1?'latest':''}" style="height:${Math.max(3,pct*0.8)}%"></div><div class="bar-lbl">${lbl}</div></div>`;
-  }).join('');
-  list.innerHTML=recs.slice().reverse().slice(0,6).map(r=>`
-    <div class="bank-item">
-      <div class="bank-item-left">
-        <div class="bank-month">${r.month}</div>
-        <div class="bank-name-badge">${esc(r.bank)}</div>
-      </div>
-      <div class="bank-amount">${fm(r.amount)}</div>
-      <button class="bank-del" onclick="deleteBankRec('${r.month}','${esc(r.bank)}')">✕</button>
-    </div>`).join('');
+  const allRecs=getBankRecs();
+
+  if(activeBankIdx===-1){
+    // 合計タブ：月ごとに全口座の合計を集計
+    document.getElementById('chartTitle').textContent='全口座 合計残高推移';
+    const monthMap={};
+    allRecs.forEach(r=>{
+      if(!monthMap[r.month])monthMap[r.month]=0;
+      monthMap[r.month]+=r.amount;
+    });
+    const months=Object.keys(monthMap).sort();
+    if(!months.length){chart.innerHTML=`<div class="empty" style="width:100%">記録がありません</div>`;list.innerHTML='';return}
+    const totals=months.map(m=>({month:m,amount:monthMap[m]}));
+    const max=Math.max(...totals.map(t=>t.amount));
+    const recent=totals.slice(-12);
+    chart.innerHTML=recent.map((r,i)=>{
+      const pct=max>0?(r.amount/max)*100:0;
+      const lbl=r.month.slice(2,4)+'/'+r.month.slice(5,7);
+      return`<div class="bar-wrap"><div class="bar-val">${fm(r.amount)}</div><div class="bar ${i===recent.length-1?'latest':''}" style="height:${Math.max(3,pct*0.8)}%"></div><div class="bar-lbl">${lbl}</div></div>`;
+    }).join('');
+    // リスト：月ごとに内訳も表示
+    list.innerHTML=totals.slice().reverse().slice(0,6).map(r=>{
+      const breakdown=banks.map(b=>{
+        const rec=allRecs.find(a=>a.month===r.month&&a.bank===b);
+        return rec?`<div style="font-size:9px;color:var(--dim)">${esc(b)}: ${fm(rec.amount)}</div>`:'';
+      }).join('');
+      return`<div class="bank-item" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <div style="display:flex;justify-content:space-between;width:100%">
+          <div class="bank-month">${r.month}</div>
+          <div class="bank-amount">${fm(r.amount)}</div>
+        </div>
+        <div>${breakdown}</div>
+      </div>`;
+    }).join('');
+  } else {
+    // 個別口座タブ
+    const bankName=banks[activeBankIdx]||'';
+    document.getElementById('chartTitle').textContent=`${bankName} 残高推移`;
+    const recs=allRecs.filter(r=>r.bank===bankName).sort((a,b)=>a.month.localeCompare(b.month));
+    if(!recs.length){chart.innerHTML=`<div class="empty" style="width:100%">記録がありません</div>`;list.innerHTML='';return}
+    const max=Math.max(...recs.map(r=>r.amount));
+    const recent=recs.slice(-12);
+    chart.innerHTML=recent.map((r,i)=>{
+      const pct=max>0?(r.amount/max)*100:0;
+      const lbl=r.month.slice(2,4)+'/'+r.month.slice(5,7);
+      return`<div class="bar-wrap"><div class="bar-val">${fm(r.amount)}</div><div class="bar ${i===recent.length-1?'latest':''}" style="height:${Math.max(3,pct*0.8)}%"></div><div class="bar-lbl">${lbl}</div></div>`;
+    }).join('');
+    list.innerHTML=recs.slice().reverse().slice(0,6).map(r=>`
+      <div class="bank-item">
+        <div class="bank-item-left">
+          <div class="bank-month">${r.month}</div>
+          <div class="bank-name-badge">${esc(r.bank)}</div>
+        </div>
+        <div class="bank-amount">${fm(r.amount)}</div>
+        <button class="bank-del" onclick="deleteBankRec('${r.month}','${esc(r.bank)}')">✕</button>
+      </div>`).join('');
+  }
 }
 
 function initBankSel(){
