@@ -44,7 +44,10 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
 .sum-label{font-size:9px;color:var(--dim);margin-bottom:3px;letter-spacing:.5px}
 .sum-value{font-family:'DM Mono',monospace;font-size:14px;font-weight:500}
 .sum-value.inc{color:var(--blue)}.sum-value.exp{color:var(--red)}.sum-value.bal{color:var(--accent)}.sum-value.neg{color:var(--red)}
-.carryover{grid-column:1/-1;text-align:center;font-size:9px;color:var(--accent);background:var(--al);border-radius:6px;padding:3px 8px;margin-top:4px}
+.carryover{grid-column:1/-1;text-align:center;font-size:9px;border-radius:6px;padding:4px 8px;margin-top:4px;font-family:'DM Mono',monospace}
+.carryover.plus{color:var(--accent);background:var(--al)}
+.carryover.minus{color:var(--red);background:var(--rl)}
+.carryover.great{color:#fff;background:var(--accent);font-size:10px;font-weight:700;letter-spacing:.5px}
 
 /* CALENDAR */
 .cal-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px}
@@ -159,6 +162,16 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
 .bnav-btn.active{color:var(--accent)}
 .bnav-icon{font-size:20px}.bnav-label{font-size:9px;margin-top:1px;font-family:'Noto Serif JP',serif}
 .empty{text-align:center;padding:28px;color:var(--dim);font-size:12px}
+
+/* BACKUP */
+.backup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.backup-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.backup-btn{padding:11px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--surface2);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'Noto Serif JP',serif;display:flex;align-items:center;justify-content:center;gap:6px}
+.backup-btn.export{border-color:var(--accent);color:var(--accent);background:var(--al)}
+.backup-btn.import{border-color:var(--blue);color:var(--blue);background:var(--bl)}
+.backup-btn:active{opacity:.7}
+.backup-note{font-size:10px;color:var(--dim);margin-top:8px;line-height:1.6}
+.backup-stamp{font-size:10px;color:var(--dim);margin-top:6px;font-family:'DM Mono',monospace}
 </style>
 </head>
 <body>
@@ -175,6 +188,7 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
   <div class="tabs">
     <div class="tab active" onclick="showPage('kakeibo')">収支</div>
     <div class="tab" onclick="showPage('bank')">口座残高</div>
+    <div class="tab" onclick="showPage('backup')">バックアップ</div>
   </div>
 </div>
 
@@ -219,6 +233,22 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
       <div class="bank-list" id="bankList"></div>
     </div>
   </div>
+
+  <div class="page" id="page-backup">
+    <div class="backup-card">
+      <div class="sec-title">データのバックアップ</div>
+      <div class="backup-btns">
+        <button class="backup-btn export" onclick="exportData()">↑ 書き出し</button>
+        <button class="backup-btn import" onclick="document.getElementById('importFile').click()">↓ 読み込み</button>
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <div class="backup-note">
+        書き出し：全データをJSONファイルとして保存します。<br>
+        読み込み：書き出したJSONファイルを選択するとデータを復元します（現在のデータは上書きされます）。
+      </div>
+      <div class="backup-stamp" id="backupStamp"></div>
+    </div>
+  </div>
 </div>
 
 <div class="bottom-nav">
@@ -227,6 +257,9 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
   </button>
   <button class="bnav-btn" id="nav-bank" onclick="showPage('bank')">
     <div class="bnav-icon">🏦</div><div class="bnav-label">口座残高</div>
+  </button>
+  <button class="bnav-btn" id="nav-backup" onclick="showPage('backup')">
+    <div class="bnav-icon">💾</div><div class="bnav-label">バックアップ</div>
   </button>
 </div>
 
@@ -331,10 +364,21 @@ function saveCustomCats(type,cats){ const d=getData();if(!d.customCats)d.customC
 
 // ── HELPERS ──
 function getPeriod(off){
-  const today=new Date();const soy=new Date(today.getFullYear(),0,1);
-  const doy=Math.floor((today-soy)/86400000);const idx=Math.floor(doy/60)+off;
-  const s=new Date(soy);s.setDate(s.getDate()+idx*60);
-  const e=new Date(s);e.setDate(e.getDate()+59);return{start:s,end:e}
+  // 25日始まり60日区切り
+  // 基準：各月25日スタート → 翌々月24日終わり
+  const today=new Date();
+  let y=today.getFullYear();let m=today.getMonth(); // 0-indexed
+  // 今日が25日以降なら今月25日スタート、それ以前なら前月25日スタート
+  const d=today.getDate();
+  if(d<25){m-=1;if(m<0){m=11;y-=1}}
+  // currentPeriodの開始は y年m月25日
+  // offsetを適用（2ヶ月ずつ）
+  let sm=m+off*2; let sy=y;
+  while(sm<0){sm+=12;sy--}
+  while(sm>11){sm-=12;sy++}
+  const s=new Date(sy,sm,25);
+  const e=new Date(sy,sm+2,24); // 2ヶ月後の24日
+  return{start:s,end:e}
 }
 function fd(d){return d.toISOString().slice(0,10)}
 function fm(n){return(n<0?'−':'')+'¥'+Math.abs(Math.round(n)).toLocaleString('ja-JP')}
@@ -352,7 +396,9 @@ function getCatIcon(catId){return ICONS[catId]||ICONS.custom}
 function renderKakeibo(){
   const {start,end}=getPeriod(periodOffset);
   const lbl=s=>`${s.getMonth()+1}/${s.getDate()}`;
-  document.getElementById('periodLabel').textContent=`${start.getFullYear()} ${lbl(start)}〜${lbl(end)}`;
+  // 期間が2ヶ月にまたがる場合、年をどちらで表示するか
+  const yearLabel=start.getFullYear()===end.getFullYear()?`${start.getFullYear()} `:'';
+  document.getElementById('periodLabel').textContent=`${yearLabel}${lbl(start)}〜${lbl(end)}`;
   const all=getTxs();
   const ptxs=all.filter(t=>t.date>=fd(start)&&t.date<=fd(end));
   const prev=getPeriod(periodOffset-1);
@@ -360,12 +406,25 @@ function renderKakeibo(){
   const prevBal=prevTxs.reduce((s,t)=>s+(t.type==='income'?t.amount:-t.amount),0);
   const income=ptxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
   const expense=ptxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-  const balance=income-expense+(prevBal>0?prevBal:0);
+  // 残高は前期繰越を常に加算（プラスでもマイナスでも）
+  const balance=income-expense+prevBal;
+  // 繰越バッジの内容
+  let carryoverHtml='';
+  if(prevBal!==0){
+    const sign=prevBal>0?'+':'';
+    if(prevBal>=20000){
+      carryoverHtml=`<div class="carryover great">🎉 えらい！前期繰越 ${sign}${fms(prevBal)}</div>`;
+    } else if(prevBal>0){
+      carryoverHtml=`<div class="carryover plus">前期繰越 ${sign}${fms(prevBal)}</div>`;
+    } else {
+      carryoverHtml=`<div class="carryover minus">前期繰越 ${sign}${fms(prevBal)}</div>`;
+    }
+  }
   document.getElementById('summaryBar').innerHTML=`
     <div class="sum-item"><div class="sum-label">収入</div><div class="sum-value inc">${fms(income)}</div></div>
     <div class="sum-item"><div class="sum-label">支出</div><div class="sum-value exp">${fms(expense)}</div></div>
     <div class="sum-item"><div class="sum-label">残高</div><div class="sum-value ${balance>=0?'bal':'neg'}">${fms(balance)}</div></div>
-    ${prevBal>0?`<div class="carryover">前期繰越 +${fms(prevBal)}</div>`:''}
+    ${carryoverHtml}
   `;
   // Calendar
   const calS=new Date(start);calS.setDate(calS.getDate()-calS.getDay());
@@ -586,12 +645,47 @@ function showPage(name){
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   document.getElementById(`nav-${name}`).classList.add('active');
-  document.querySelectorAll('.tab')[name==='kakeibo'?0:1].classList.add('active');
+  const tabIdx={'kakeibo':0,'bank':1,'backup':2}[name]??0;
+  document.querySelectorAll('.tab')[tabIdx].classList.add('active');
   document.getElementById('periodNav').style.display=name==='bank'?'none':'flex';
   if(name==='bank'){renderBankTabs();renderBank()}
   if(name==='kakeibo')renderKakeibo();
+  if(name==='backup'){document.getElementById('backupStamp').textContent=''}
 }
 function changePeriod(delta){periodOffset+=delta;selectedDate=null;renderKakeibo()}
+
+// ── BACKUP ──
+function exportData(){
+  const data=getData();
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const now=new Date();
+  const stamp=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+  const a=document.createElement('a');
+  a.href=url;a.download=`kakeibo_backup_${stamp}.json`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+  document.getElementById('backupStamp').textContent=`最終書き出し：${now.toLocaleString('ja-JP')}`;
+}
+
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  if(!confirm('現在のデータをすべて上書きします。よろしいですか？')){e.target.value='';return}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(typeof data!=='object'||Array.isArray(data))throw new Error();
+      saveData(data);
+      alert('読み込み完了！データを復元しました。');
+      renderBankTabs();renderKakeibo();
+      document.getElementById('backupStamp').textContent=`最終読み込み：${new Date().toLocaleString('ja-JP')} (${file.name})`;
+    }catch{alert('ファイルが正しくありません。書き出したJSONファイルを選択してください。')}
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
 
 if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 
