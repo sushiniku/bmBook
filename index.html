@@ -20,29 +20,28 @@
   --r:16px; --rs:10px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+input,select,textarea{font-size:16px!important;touch-action:manipulation}
 body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;padding-top:var(--safe-top)}
 
 /* HEADER */
-.header{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:12px 16px 0}
+.header{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 16px}
 .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .app-title{font-size:17px;font-weight:700;color:var(--accent)}
 .period-nav{display:flex;align-items:center;gap:8px}
 .nav-btn{width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .nav-btn:active{background:var(--border)}
 .period-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);min-width:110px;text-align:center}
-.tabs{display:flex}
-.tab{flex:1;padding:8px 4px;text-align:center;font-size:12px;font-weight:700;color:var(--dim);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
 
 /* MAIN */
-.main{padding:14px 12px;padding-bottom:calc(72px + var(--safe-bottom))}
+.main{padding:10px 10px;padding-bottom:calc(72px + var(--safe-bottom))}
 .page{display:none}.page.active{display:block}
 
 /* SUMMARY */
-.summary-bar{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 8px;margin-bottom:12px;gap:4px}
+.summary-bar{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:8px 6px;margin-bottom:8px;gap:3px}
 .sum-item{text-align:center}
 .sum-label{font-size:9px;color:var(--dim);margin-bottom:3px;letter-spacing:.5px}
-.sum-value{font-family:'DM Mono',monospace;font-size:14px;font-weight:500}
+.sum-value{font-family:'DM Mono',monospace;font-size:13px;font-weight:500}
 .sum-value.inc{color:var(--blue)}.sum-value.exp{color:var(--red)}.sum-value.bal{color:var(--accent)}.sum-value.neg{color:var(--red)}
 .carryover{grid-column:1/-1;text-align:center;font-size:9px;border-radius:6px;padding:4px 8px;margin-top:4px;font-family:'DM Mono',monospace}
 .carryover.plus{color:var(--accent);background:var(--al)}
@@ -53,18 +52,18 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
 .cal-header{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px}
 .cal-dow{text-align:center;font-size:9px;font-weight:700;color:var(--dim);padding:3px 0}
 .cal-dow.sun{color:var(--red)}.cal-dow.sat{color:var(--blue)}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-cell{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 3px 5px;min-height:56px;cursor:pointer;transition:background .12s}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.cal-cell{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:3px 2px 4px;min-height:44px;cursor:pointer;transition:background .12s}
 .cal-cell:active{background:var(--surface2)}
 .cal-cell.today{border-color:var(--accent)}
 .cal-cell.today .cal-day{color:var(--accent)!important;font-weight:700}
 .cal-cell.selected{background:var(--al);border-color:var(--accent)}
 .cal-cell.out-period{background:repeating-linear-gradient(45deg,var(--surface2) 0,var(--surface2) 2px,var(--surface) 2px,var(--surface) 8px);opacity:.55}
 .cal-cell.sun .cal-day{color:var(--red)}.cal-cell.sat .cal-day{color:var(--blue)}
-.cal-day{font-size:11px;margin-bottom:3px}
-.cal-amounts{display:flex;flex-direction:column;gap:1px}
-.cal-inc{font-family:'DM Mono',monospace;font-size:8px;color:var(--blue);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal-exp{font-family:'DM Mono',monospace;font-size:8px;color:var(--red);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-day{font-size:10px;margin-bottom:2px;line-height:1}
+.cal-amounts{display:flex;flex-direction:column;gap:0px}
+.cal-inc{font-family:'DM Mono',monospace;font-size:7px;color:var(--blue);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-exp{font-family:'DM Mono',monospace;font-size:7px;color:var(--red);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* DAY DETAIL */
 .day-detail{margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
@@ -146,10 +145,16 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
 .cat-btn.sel .cat-label{color:var(--accent);font-weight:700}
 
 /* カスタムカテゴリ追加 */
-.add-cat-row{display:flex;gap:6px;margin-bottom:14px}
-.add-cat-input{flex:1;font-family:'Noto Serif JP',serif}
-.add-cat-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:9px 12px;font-size:12px;color:var(--text);cursor:pointer;white-space:nowrap;font-family:'Noto Serif JP',serif}
-.add-cat-btn:active{background:var(--border)}
+.add-cat-toggle{display:flex;justify-content:flex-end;margin-bottom:6px}
+.add-cat-toggle-btn{background:none;border:1px dashed var(--border);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--dim);cursor:pointer;font-family:'Noto Serif JP',serif}
+.add-cat-toggle-btn:active{background:var(--surface2)}
+.add-cat-panel{display:none;margin-bottom:10px}
+.add-cat-panel.open{display:block}
+.add-cat-row{display:grid;grid-template-columns:1fr 80px auto;gap:6px;margin-bottom:6px}
+.add-cat-input{font-family:'Noto Serif JP',serif}
+.add-cat-amount{font-family:'DM Mono',monospace}
+.add-cat-btn{background:var(--accent);border:none;border-radius:var(--rs);padding:9px 12px;font-size:12px;color:white;font-weight:700;cursor:pointer;font-family:'Noto Serif JP',serif}
+.add-cat-btn:active{opacity:.8}
 
 .modal-field{margin-bottom:11px}
 .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
@@ -178,18 +183,14 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
 
 <div class="header">
   <div class="header-top">
-    <div class="app-title">📒 家計簿</div>
+    <div class="app-title" style="display:flex;align-items:center;gap:8px"><span style="width:22px;height:22px;display:inline-flex;flex-shrink:0;color:var(--accent)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><polygon points="373.103,133.628 369.368,133.628 358.087,133.628 354.353,133.628 354.353,164.581 349.165,167.909 336.806,167.909 336.806,133.628 336.759,133.628 320.712,133.628 318.196,133.628 318.196,167.909 292.665,167.909 292.665,189.19 318.196,189.19 318.196,223.472 320.712,223.472 336.759,223.472 336.806,223.472 336.806,189.19 349.196,189.19 354.353,192.519 354.353,223.472 358.087,223.472 369.368,223.472 373.103,223.472 373.103,204.597 397.524,220.269 397.524,217.878 397.524,202.237 397.524,199.847 364.399,178.534 397.524,157.253 397.524,154.862 397.524,139.222 397.524,136.815 373.103,152.519"/><path d="M462.321,245.8c-2.359,0-7.422,0-14.344,0c0.609-24.641,4.391-58.063,10.688-92.297c6.859-37.516,16.719-76.172,28.078-105.484l-0.078-0.031c0.922-2.203,1.594-4.688,1.578-7.266c0.016-3.906-1.281-7.484-2.891-10.094c-3.109-4.922-6.75-7.406-10.469-9.672c-6.516-3.781-14.172-6.438-23.297-8.953c-13.641-3.672-30.375-6.625-48.328-8.719c-17.938-2.078-37.047-3.281-55.156-3.281c-29.469,0.016-61.5,3.141-86.953,8.188c-12.781,2.563-23.828,5.5-32.719,9.234c-4.484,1.938-8.453,3.969-12.219,7.078c-1.875,1.578-3.75,3.484-5.375,6.125c-1.594,2.609-2.891,6.203-2.875,10.094c-0.016,2.625,0.656,5.141,1.594,7.359l-0.063,0.031c11.188,28.328,21.063,66.953,27.953,104.719c2.766,15,5.031,29.891,6.781,44c-39.734,11.047-60.047,74.109-101.297,74.109v180.75c39.484,0,144.234,43.906,175.938,50.266c35.906,7.188,82.828,23.031,107.719-10.781c15.359-20.844,39.406-101.781,57.453-159.188C529.837,287.987,498.228,245.8,462.321,245.8z M430.196,148.284c-6.547,35.828-10.547,70.5-11.156,97.516c-48.406,0-121.281,0-141.875,0c-0.641-27.188-4.672-62.203-11.25-98.188c-4.234-23.109-9.516-46.422-15.625-68.094l2.109,2.859c32-12.359,37.703-33.109,37.781-49.563c18.531-2.422,39.047-3.906,57.922-3.875c19.25-0.016,40.156,1.5,58.953,4.016c0.484,16.141,6.859,35.875,37.734,47.797l1.391-1.906C439.884,101.065,434.509,124.831,430.196,148.284z"/><path d="M5.181,306.081v157.125c0,19.422,15.734,35.156,35.156,35.156h41.938c12.953,0,23.453-10.5,23.453-23.438V270.94H40.337C20.915,270.94,5.181,286.675,5.181,306.081z"/></svg></span>家計簿</div>
     <div class="period-nav" id="periodNav">
       <button class="nav-btn" onclick="changePeriod(-1)">‹</button>
       <div class="period-label" id="periodLabel">--</div>
       <button class="nav-btn" onclick="changePeriod(1)">›</button>
     </div>
   </div>
-  <div class="tabs">
-    <div class="tab active" onclick="showPage('kakeibo')">収支</div>
-    <div class="tab" onclick="showPage('bank')">口座残高</div>
-    <div class="tab" onclick="showPage('backup')">バックアップ</div>
-  </div>
+
 </div>
 
 <div class="main">
@@ -253,13 +254,13 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
 
 <div class="bottom-nav">
   <button class="bnav-btn active" id="nav-kakeibo" onclick="showPage('kakeibo')">
-    <div class="bnav-icon">📒</div><div class="bnav-label">収支</div>
+    <div class="bnav-icon" style="display:flex;justify-content:center"><span style="width:22px;height:22px;display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><polygon points="373.103,133.628 369.368,133.628 358.087,133.628 354.353,133.628 354.353,164.581 349.165,167.909 336.806,167.909 336.806,133.628 336.759,133.628 320.712,133.628 318.196,133.628 318.196,167.909 292.665,167.909 292.665,189.19 318.196,189.19 318.196,223.472 320.712,223.472 336.759,223.472 336.806,223.472 336.806,189.19 349.196,189.19 354.353,192.519 354.353,223.472 358.087,223.472 369.368,223.472 373.103,223.472 373.103,204.597 397.524,220.269 397.524,217.878 397.524,202.237 397.524,199.847 364.399,178.534 397.524,157.253 397.524,154.862 397.524,139.222 397.524,136.815 373.103,152.519"/><path d="M462.321,245.8c-2.359,0-7.422,0-14.344,0c0.609-24.641,4.391-58.063,10.688-92.297c6.859-37.516,16.719-76.172,28.078-105.484l-0.078-0.031c0.922-2.203,1.594-4.688,1.578-7.266c0.016-3.906-1.281-7.484-2.891-10.094c-3.109-4.922-6.75-7.406-10.469-9.672c-6.516-3.781-14.172-6.438-23.297-8.953c-13.641-3.672-30.375-6.625-48.328-8.719c-17.938-2.078-37.047-3.281-55.156-3.281c-29.469,0.016-61.5,3.141-86.953,8.188c-12.781,2.563-23.828,5.5-32.719,9.234c-4.484,1.938-8.453,3.969-12.219,7.078c-1.875,1.578-3.75,3.484-5.375,6.125c-1.594,2.609-2.891,6.203-2.875,10.094c-0.016,2.625,0.656,5.141,1.594,7.359l-0.063,0.031c11.188,28.328,21.063,66.953,27.953,104.719c2.766,15,5.031,29.891,6.781,44c-39.734,11.047-60.047,74.109-101.297,74.109v180.75c39.484,0,144.234,43.906,175.938,50.266c35.906,7.188,82.828,23.031,107.719-10.781c15.359-20.844,39.406-101.781,57.453-159.188C529.837,287.987,498.228,245.8,462.321,245.8z M430.196,148.284c-6.547,35.828-10.547,70.5-11.156,97.516c-48.406,0-121.281,0-141.875,0c-0.641-27.188-4.672-62.203-11.25-98.188c-4.234-23.109-9.516-46.422-15.625-68.094l2.109,2.859c32-12.359,37.703-33.109,37.781-49.563c18.531-2.422,39.047-3.906,57.922-3.875c19.25-0.016,40.156,1.5,58.953,4.016c0.484,16.141,6.859,35.875,37.734,47.797l1.391-1.906C439.884,101.065,434.509,124.831,430.196,148.284z"/><path d="M5.181,306.081v157.125c0,19.422,15.734,35.156,35.156,35.156h41.938c12.953,0,23.453-10.5,23.453-23.438V270.94H40.337C20.915,270.94,5.181,286.675,5.181,306.081z"/></svg></span></div><div class="bnav-label">収支</div>
   </button>
   <button class="bnav-btn" id="nav-bank" onclick="showPage('bank')">
-    <div class="bnav-icon">🏦</div><div class="bnav-label">口座残高</div>
+    <div class="bnav-icon" style="display:flex;justify-content:center"><span style="width:22px;height:22px;display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><polygon points="256,0 23.875,100.719 23.875,136.859 256,136.859 488.141,136.859 488.141,100.719"/><rect x="7.281" y="449.813" width="497.438" height="62.188"/><rect x="48.734" y="170.016" width="66.328" height="244.578"/><rect x="164.813" y="170.016" width="66.313" height="244.578"/><rect x="280.875" y="170.016" width="66.328" height="244.578"/><rect x="396.938" y="170.016" width="66.328" height="244.578"/></svg></span></div><div class="bnav-label">口座残高</div>
   </button>
   <button class="bnav-btn" id="nav-backup" onclick="showPage('backup')">
-    <div class="bnav-icon">💾</div><div class="bnav-label">バックアップ</div>
+    <div class="bnav-icon" style="display:flex;justify-content:center"><span style="width:22px;height:22px;display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M502.395,106.098L396.296,0h-15.162v121.49H130.866V0H60.271C26.987,0,0,26.987,0,60.271v391.458C0,485.013,26.987,512,60.271,512h391.458C485.014,512,485.013,512,512,451.729V129.286C512,120.591,508.542,112.256,502.395,106.098z M120.811,446.532H63.029v-55.122h57.782V446.532z"/><rect x="282.012" width="68.027" height="94.015"/></svg></span></div><div class="bnav-label">バックアップ</div>
   </button>
 </div>
 
@@ -273,17 +274,23 @@ body{font-family:'Noto Serif JP',serif;background:var(--bg);color:var(--text);mi
       <div class="type-btn expense" onclick="setType('expense')">支出 −</div>
     </div>
     <div class="cat-grid" id="catGrid"></div>
-    <div class="add-cat-row">
-      <input class="input-field add-cat-input" type="text" id="newCatName" placeholder="カテゴリを追加…">
-      <button class="add-cat-btn" onclick="addCustomCat()">＋</button>
+    <div class="add-cat-toggle">
+      <button class="add-cat-toggle-btn" onclick="toggleAddCat()">＋ カテゴリを追加</button>
+    </div>
+    <div class="add-cat-panel" id="addCatPanel">
+      <div class="add-cat-row">
+        <input class="input-field add-cat-input" type="text" id="newCatName" placeholder="カテゴリ名…">
+        <input class="input-field add-cat-amount" type="number" id="newCatAmount" placeholder="金額" inputmode="numeric">
+        <button class="add-cat-btn" onclick="addCustomCat()">追加</button>
+      </div>
+    </div>
+    <div class="modal-field">
+      <div class="field-label">金額 (円)</div>
+      <input class="input-field" type="text" id="txAmount" placeholder="0" inputmode="numeric" oninput="formatAmountInput(this)" style="font-family:'DM Mono',monospace">
     </div>
     <div class="modal-field">
       <div class="field-label">メモ (任意)</div>
       <input class="input-field" type="text" id="txMemo" placeholder="備考…">
-    </div>
-    <div class="modal-field">
-      <div class="field-label">金額 (円)</div>
-      <input class="input-field" type="number" id="txAmount" placeholder="0" inputmode="numeric">
     </div>
     <div class="modal-field">
       <div class="field-label">日付</div>
@@ -447,7 +454,17 @@ function renderKakeibo(){
   renderDayDetail(selectedDate,ptxs);
 }
 
+let lastTapDate=null;let lastTapTime=0;
 function selectDay(ds){
+  const now=Date.now();
+  if(lastTapDate===ds && now-lastTapTime<400){
+    // ダブルタップ → 入力モーダル
+    selectedDate=ds;
+    openModal(null,ds);
+    lastTapDate=null;
+    return;
+  }
+  lastTapDate=ds;lastTapTime=now;
   selectedDate=selectedDate===ds?null:ds;
   renderKakeibo();
   if(selectedDate){setTimeout(()=>document.getElementById('dayDetail').scrollIntoView({behavior:'smooth',block:'nearest'}),80)}
@@ -578,9 +595,9 @@ function openModal(id,defaultDate){
   selectedCat=tx?tx.cat:'food';
   document.getElementById('modalTitle').textContent=tx?'取引を編集':'取引を追加';
   document.getElementById('txMemo').value=tx?(tx.memo||''):'';
-  document.getElementById('txAmount').value=tx?tx.amount:'';
+  const initAmt=tx?tx.amount:null;document.getElementById('txAmount').value=initAmt?Number(initAmt).toLocaleString('ja-JP'):'';
   document.getElementById('txDate').value=tx?tx.date:modalDate;
-  document.getElementById('newCatName').value='';
+  document.getElementById('newCatName').value='';document.getElementById('addCatPanel').classList.remove('open');
   updateTypeBtns();renderCatGrid();
   document.getElementById('modalOverlay').classList.add('open');
 }
@@ -605,22 +622,44 @@ function renderCatGrid(){
       <span class="cat-label">${esc(c.label)}</span>
     </div>`).join('');
 }
-function selCat(id){selectedCat=id;renderCatGrid()}
+function selCat(id){
+  selectedCat=id;
+  // カスタムカテゴリのデフォルト金額があればセット
+  const custom=getCustomCats(modalType);
+  const cat=custom.find(c=>c.id===id);
+  if(cat&&cat.defAmount&&!document.getElementById('txAmount').value){
+    document.getElementById('txAmount').value=cat.defAmount;
+    updateAmountDisplay(cat.defAmount);
+  }
+  renderCatGrid();
+}
 
+function toggleAddCat(){
+  document.getElementById('addCatPanel').classList.toggle('open');
+}
 function addCustomCat(){
   const name=document.getElementById('newCatName').value.trim();
-  if(!name)return;
+  if(!name){alert('カテゴリ名を入力してください');return}
+  const amountStr=document.getElementById('newCatAmount').value;
+  const defAmount=amountStr?parseFloat(amountStr):null;
   const id='custom_'+Date.now();
   const cats=getCustomCats(modalType);
-  cats.push({id,label:name});
+  cats.push({id,label:name,defAmount});
   saveCustomCats(modalType,cats);
   selectedCat=id;
-  document.getElementById('newCatName').value='';
+  // デフォルト金額があればセット
+  if(defAmount){
+    document.getElementById('txAmount').value=defAmount;
+    updateAmountDisplay(defAmount);
+  }
+  document.getElementById('newCatName').value='';document.getElementById('addCatPanel').classList.remove('open');
+  document.getElementById('newCatAmount').value='';
+  document.getElementById('addCatPanel').classList.remove('open');
   renderCatGrid();
 }
 
 function saveTx(){
-  const amount=parseFloat(document.getElementById('txAmount').value);
+  const amount=parseFloat(document.getElementById('txAmount').value.replace(/,/g,''));
   const date=document.getElementById('txDate').value;
   const memo=document.getElementById('txMemo').value.trim();
   if(!selectedCat){alert('カテゴリを選んでください');return}
@@ -645,8 +684,6 @@ function showPage(name){
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   document.getElementById(`nav-${name}`).classList.add('active');
-  const tabIdx={'kakeibo':0,'bank':1,'backup':2}[name]??0;
-  document.querySelectorAll('.tab')[tabIdx].classList.add('active');
   document.getElementById('periodNav').style.display=name==='bank'?'none':'flex';
   if(name==='bank'){renderBankTabs();renderBank()}
   if(name==='kakeibo')renderKakeibo();
@@ -687,6 +724,14 @@ function importData(e){
   reader.readAsText(file);
 }
 
+function formatAmountInput(el){
+  const raw=el.value.replace(/[^0-9]/g,'');
+  if(!raw){el.value='';return}
+  el.value=Number(raw).toLocaleString('ja-JP');
+}
+function updateAmountDisplay(val){
+  document.getElementById('txAmount').value=val?Number(val).toLocaleString('ja-JP'):'';
+}
 if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 
 initBankSel();
