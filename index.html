@@ -425,7 +425,7 @@ function renderKakeibo(){
   let carryoverHtml='';
   if(prevBal!==0){
     const sign=prevBal>0?'+':'';
-    if(prevBal>=20000){
+    if(prevBal>=50000){
       carryoverHtml=`<div class="carryover great">🎉 えらい！前期繰越 ${sign}${fms(prevBal)}</div>`;
     } else if(prevBal>0){
       carryoverHtml=`<div class="carryover plus">前期繰越 ${sign}${fms(prevBal)}</div>`;
