@@ -419,18 +419,17 @@ function renderKakeibo(){
   const prevBal=prevTxs.reduce((s,t)=>s+(t.type==='income'?t.amount:-t.amount),0);
   const income=ptxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
   const expense=ptxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-  // 残高は前期繰越を常に加算（プラスでもマイナスでも）
-  const balance=income-expense+prevBal;
+  // 残高：前期がマイナスのときだけ引き継ぐ。プラスは引き継がない
+  const balance=income-expense+(prevBal<0?prevBal:0);
   // 繰越バッジの内容
   let carryoverHtml='';
   if(prevBal!==0){
-    const sign=prevBal>0?'+':'';
     if(prevBal>=50000){
-      carryoverHtml=`<div class="carryover great">🎉 えらい！前期繰越 ${sign}${fms(prevBal)}</div>`;
+      carryoverHtml=`<div class="carryover great">🎉 えらい！前期 +${fms(prevBal)} 貯めた！</div>`;
     } else if(prevBal>0){
-      carryoverHtml=`<div class="carryover plus">前期繰越 ${sign}${fms(prevBal)}</div>`;
+      carryoverHtml=`<div class="carryover plus">前期 +${fms(prevBal)} 貯めた！</div>`;
     } else {
-      carryoverHtml=`<div class="carryover minus">前期繰越 ${sign}${fms(prevBal)}</div>`;
+      carryoverHtml=`<div class="carryover minus">前期の赤字 ${fms(prevBal)} を繰越</div>`;
     }
   }
   document.getElementById('summaryBar').innerHTML=`
@@ -484,14 +483,14 @@ function renderDayDetail(ds,ptxs){
   const label=`${d.getMonth()+1}月${d.getDate()}日（${DOW[d.getDay()]}）`;
   const txs=ptxs.filter(t=>t.date===ds);
   const txHtml=txs.length===0?`<div class="day-empty">取引がありません</div>`:txs.map(t=>`
-    <div class="tx-item">
+    <div class="tx-item" onclick="openModal('${t.id}')" style="cursor:pointer">
       <div class="tx-icon ${t.type==='income'?'inc':'exp'}" style="color:var(--accent)">${getCatIcon(t.cat)}</div>
       <div class="tx-body">
         <div class="tx-cat">${esc(getCatLabel(t.cat,t.type))}</div>
         ${t.memo?`<div class="tx-memo">${esc(t.memo)}</div>`:''}
       </div>
       <div class="tx-amt ${t.type==='income'?'inc':'exp'}">${t.type==='income'?'+':'-'}${fm(t.amount)}</div>
-      <button class="tx-del" onclick="deleteTx('${t.id}')">✕</button>
+      <button class="tx-del" onclick="event.stopPropagation();deleteTx('${t.id}')">✕</button>
     </div>`).join('');
   el.innerHTML=`<div class="day-detail">
     <div class="day-detail-header">
