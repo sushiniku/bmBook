@@ -406,6 +406,15 @@ function getCatLabel(catId,type){
 function getCatIcon(catId){return ICONS[catId]||ICONS.custom}
 
 // ── RENDER KAKEIBO ──
+// 期間の最終残高（前期のマイナスを順に引き継いだ値）
+function periodBalance(off,all){
+  const p=getPeriod(off);
+  if(!all.some(t=>t.date<=fd(p.end)))return 0;
+  const txs=all.filter(t=>t.date>=fd(p.start)&&t.date<=fd(p.end));
+  const own=txs.reduce((s,t)=>s+(t.type==='income'?t.amount:-t.amount),0);
+  const carry=periodBalance(off-1,all);
+  return own+(carry<0?carry:0);
+}
 function renderKakeibo(){
   const {start,end}=getPeriod(periodOffset);
   const lbl=s=>`${s.getMonth()+1}/${s.getDate()}`;
@@ -414,9 +423,7 @@ function renderKakeibo(){
   document.getElementById('periodLabel').textContent=`${yearLabel}${lbl(start)}〜${lbl(end)}`;
   const all=getTxs();
   const ptxs=all.filter(t=>t.date>=fd(start)&&t.date<=fd(end));
-  const prev=getPeriod(periodOffset-1);
-  const prevTxs=all.filter(t=>t.date>=fd(prev.start)&&t.date<=fd(prev.end));
-  const prevBal=prevTxs.reduce((s,t)=>s+(t.type==='income'?t.amount:-t.amount),0);
+  const prevBal=periodBalance(periodOffset-1,all);
   const income=ptxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
   const expense=ptxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
   // 残高：前期がマイナスのときだけ引き継ぐ。プラスは引き継がない
